@@ -1,6 +1,8 @@
 #include "util.h"
 #include "slp.h"
 
+
+/* a := 5+3; b:= (print(a, a-1), 10*a); print(b) */
 A_stm prog(void) {
 
 return 
