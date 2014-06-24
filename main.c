@@ -32,7 +32,6 @@ int maxargsExpList(A_expList expList)
 /* Calculate print num */
 int maxargs(A_stm stm)
 {
-  /* traverse the tree and to calculate PrintStm node number */
   if (stm == NULL)
     return 0;
 
@@ -42,12 +41,6 @@ int maxargs(A_stm stm)
     return maxargsExp(stm->u.assign.exp);
   else
     return 1 + maxargsExpList(stm->u.print.exps);
-}
-
-
-void interp(A_stm stm)
-{
-   
 }
 
 int main(int argc, char *argv[])
