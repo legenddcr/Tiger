@@ -16,6 +16,7 @@ Table_ Table(string id, int value, struct table *tail)
 struct IntAndTable {int i; Table_ t;};
 
 
+
 static int lookup(Table_ t, string key);
 static Table_ update(Table_ t, string key, int value);
 static Table_ interpStm(A_stm stm, Table_ t);
@@ -68,16 +69,25 @@ static int binop(int left, int right, A_binop op)
 
 static struct IntAndTable interpExp(A_exp exp, Table_ t)
 {
+  struct IntAndTable ret;
   assert (exp != NULL);
 
-  if (exp->kind == A_idExp)
-    return IntAndTable(lookup(t, exp->u.id), t);
-  else if (exp->kind == A_numExp)
-    return IntAndTable(exp->u.num, t);
+  if (exp->kind == A_idExp) {
+    ret.i = lookup(t, exp->u.id);
+    ret.t = t;
+    return ret;
+  }
+  else if (exp->kind == A_numExp) {
+    ret.i = exp->u.num;
+    ret.t = t;
+    return ret;
+  }
   else if (exp->kind == A_opExp) {
     struct IntAndTable left_iat = interpExp(exp->u.op.left, t);
     struct IntAndTable right_iat = interpExp(exp->u.op.right, left_iat.t);
-    return IntAndTable(binop(left_iat.i, right_iat.i, exp->u.op.oper), right_iat.t);
+    ret.i = binop(left_iat.i, right_iat.i, exp->u.op.oper);
+    ret.t = right_iat.t;
+    return ret;
   }
   else {
     assert (exp->kind == A_eseqExp);
@@ -91,9 +101,9 @@ static struct IntAndTable interpExpList(A_expList expList, Table_ t)
   assert (expList != NULL);
   
   if (expList->kind == A_pairExpList)
-    return interpExpList(expList->pair.tail, interpExp(expList->pair.head, t).t);
+    return interpExpList(expList->u.pair.tail, interpExp(expList->u.pair.head, t).t);
   else
-    return interpExp(expList->last);
+    return interpExp(expList->u.last, t);
 }
 
 void interp(A_stm stm)
