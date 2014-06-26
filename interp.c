@@ -51,7 +51,8 @@ static Table_ interpStm(A_stm stm, Table_ t)
     return update(t, stm->u.assign.id, interpExp(stm->u.assign.exp, t).i);
   else {
     struct IntAndTable iat = interpExpList(stm->u.print.exps, t);
-    printf("%d", iat.i);
+    //printf("%d", iat.i);
+    printf("\n");
     return iat.t;
   }
 }
@@ -98,12 +99,19 @@ static struct IntAndTable interpExp(A_exp exp, Table_ t)
 
 static struct IntAndTable interpExpList(A_expList expList, Table_ t)
 {
+  /* expression list can only appear in print statement. Implement print here */
   assert (expList != NULL);
   
-  if (expList->kind == A_pairExpList)
-    return interpExpList(expList->u.pair.tail, interpExp(expList->u.pair.head, t).t);
-  else
-    return interpExp(expList->u.last, t);
+  if (expList->kind == A_pairExpList) {
+    struct IntAndTable iat = interpExp(expList->u.pair.head, t);
+    printf("%d ", iat.i);
+    return interpExpList(expList->u.pair.tail, iat.t);
+  }
+  else {
+    struct IntAndTable iat = interpExp(expList->u.last, t);
+    printf("%d ", iat.i);
+    return iat;
+  }
 }
 
 void interp(A_stm stm)
